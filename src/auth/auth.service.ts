@@ -3,11 +3,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RegisterUserDTO } from './dto/register-user.dto';
 import { User } from 'src/users/user.entity';
+import { LoginUserDTO } from './dto/login-user.dto';
+import { compare } from "bcrypt";
 
 @Injectable()
 export class AuthService {
 
-    constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) {}
+    constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
+
+    async login(user: LoginUserDTO) {
+        const userExist = await this.usersRepository.findOneBy({ email: user.email });
+        const isPasswordValid = await compare(user.password, userExist?.password);
+
+        if (!userExist) {
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        if (!isPasswordValid) {
+            throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
+        }
+
+        return userExist;
+    }
 
     async register(user: RegisterUserDTO) {
         if (!user.email || !user.phone) {
