@@ -27,11 +27,11 @@ export class AuthService {
             throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
         }
 
-        const payload = { email: user.email, sub: userExist.id };
+        const payload = { id: userExist.id, name: userExist.name }
         const token = this.jwtService.sign(payload);
         const data = {
-            token,
-            user: userExist
+            user: userExist,
+            token : token
         };
 
         return data;
