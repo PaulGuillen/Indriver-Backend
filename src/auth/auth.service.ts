@@ -31,9 +31,11 @@ export class AuthService {
         const token = this.jwtService.sign(payload);
         const data = {
             user: userExist,
-            token : token
+            token : 'Bearer ' + token
         };
 
+        delete data.user.password;
+        
         return data;
     }
 
@@ -55,9 +57,19 @@ export class AuthService {
         }
 
         const newUser = this.usersRepository.create(user);
+        const userSaved = await this.usersRepository.save(newUser);
+        const payload = { id: userSaved.id, name: userSaved.name }
+        const token = this.jwtService.sign(payload);
+
+        const data = {
+            user: userSaved,
+            token : 'Bearer ' + token
+        };
+
+        delete data.user.password;
 
         try {
-            return await this.usersRepository.save(newUser);
+            return data;
         } catch (error) {
             throw new HttpException('Error while registering user', HttpStatus.INTERNAL_SERVER_ERROR);
         }
