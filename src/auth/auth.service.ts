@@ -5,11 +5,15 @@ import { RegisterUserDTO } from './dto/register-user.dto';
 import { User } from 'src/users/user.entity';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { compare } from "bcrypt";
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
 
-    constructor(@InjectRepository(User) private readonly usersRepository: Repository<User>) { }
+    constructor(
+        @InjectRepository(User) private readonly usersRepository: Repository<User>,
+        private readonly jwtService: JwtService,
+    ) { }
 
     async login(user: LoginUserDTO) {
         const userExist = await this.usersRepository.findOneBy({ email: user.email });
@@ -23,7 +27,14 @@ export class AuthService {
             throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
         }
 
-        return userExist;
+        const payload = { email: user.email, sub: userExist.id };
+        const token = this.jwtService.sign(payload);
+        const data = {
+            token,
+            user: userExist
+        };
+
+        return data;
     }
 
     async register(user: RegisterUserDTO) {
