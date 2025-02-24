@@ -5,7 +5,7 @@ import { IP_ADDRESS } from './credentials';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ forbidUnknownValues: true }));
   await app.listen(3000, process.env.HOST ?? IP_ADDRESS);
 }
 
