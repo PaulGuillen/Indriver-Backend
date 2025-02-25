@@ -31,4 +31,8 @@ export class UsersService {
         return this.usersRepository.save(updateUser);
 
     }
+
+    async updateWithImage(image: Express.Multer.File) {
+        
+    }
 }
