@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
-import cloudStorage =  require ('../utils/cloud_storage')
+import cloudStorage = require('../utils/cloud_storage')
 
 @Injectable()
 export class UsersService {
@@ -33,8 +33,22 @@ export class UsersService {
 
     }
 
-    async updateWithImage(file: Express.Multer.File) {
+    async updateWithImage(file: Express.Multer.File, id: number, user: UpdateUserDTO) {
+        debugger;
         const url = await cloudStorage(file, file.originalname)
         console.log(url)
+        if (url === undefined && url === null) {
+            return new HttpException('Error uploading image', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        const userExist = await this.usersRepository.findOneBy({ id: id });
+        if (!userExist) {
+            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        user.image = url;
+        const updateUser = Object.assign(userExist, user);
+        return this.usersRepository.save(updateUser);
+
     }
 }
