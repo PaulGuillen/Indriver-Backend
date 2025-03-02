@@ -1,17 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { RegisterUserDTO } from './dto/register-user.dto';
 import { User } from 'src/users/user.entity';
 import { LoginUserDTO } from './dto/login-user.dto';
 import { compare } from "bcrypt";
 import { JwtService } from '@nestjs/jwt';
+import { Rol } from 'src/roles/rol.entity';
 
 @Injectable()
 export class AuthService {
 
     constructor(
         @InjectRepository(User) private readonly usersRepository: Repository<User>,
+        @InjectRepository(Rol) private readonly rolesRepository: Repository<Rol>,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -31,15 +33,16 @@ export class AuthService {
         const token = this.jwtService.sign(payload);
         const data = {
             user: userExist,
-            token : 'Bearer ' + token
+            token: 'Bearer ' + token
         };
 
         delete data.user.password;
-        
+
         return data;
     }
 
     async register(user: RegisterUserDTO) {
+        debugger;
         if (!user.email || !user.phone) {
             throw new HttpException('Email and phone are required', HttpStatus.BAD_REQUEST);
         }
@@ -57,13 +60,17 @@ export class AuthService {
         }
 
         const newUser = this.usersRepository.create(user);
+        const rolesIds = user.rolesIds;
+        const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
+        newUser.roles = roles;
+        
         const userSaved = await this.usersRepository.save(newUser);
         const payload = { id: userSaved.id, name: userSaved.name }
         const token = this.jwtService.sign(payload);
 
         const data = {
             user: userSaved,
-            token : 'Bearer ' + token
+            token: 'Bearer ' + token
         };
 
         delete data.user.password;
