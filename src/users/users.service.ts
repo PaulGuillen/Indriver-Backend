@@ -25,7 +25,7 @@ export class UsersService {
     async update(id: number, user: UpdateUserDTO) {
         const userExist = await this.usersRepository.findOneBy({ id: id });
         if (!userExist) {
-            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         const updateUser = Object.assign(userExist, user);
@@ -37,12 +37,12 @@ export class UsersService {
         const url = await cloudStorage(file, file.originalname)
         console.log(url)
         if (url === undefined && url === null) {
-            return new HttpException('Error uploading image', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Error uploading image', HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         const userExist = await this.usersRepository.findOneBy({ id: id });
         if (!userExist) {
-            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         user.image = url;

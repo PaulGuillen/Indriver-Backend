@@ -66,7 +66,13 @@ export class AuthService {
         }
 
         const newUser = this.usersRepository.create(user);
-        const rolesIds = user.rolesIds;
+        let rolesIds: string[] = [];
+        if(user.rolesIds !== undefined && user.rolesIds !== null && user.rolesIds.length > 0) {
+            rolesIds = user.rolesIds;
+        } else {
+            rolesIds.push('CLIENT');
+        }
+
         const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
         newUser.roles = roles;
 
