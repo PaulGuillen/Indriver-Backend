@@ -18,7 +18,12 @@ export class AuthService {
     ) { }
 
     async login(user: LoginUserDTO) {
-        const userExist = await this.usersRepository.findOneBy({ email: user.email });
+        const userExist = await this.usersRepository.findOne({
+            where: [
+                { email: user.email },
+            ],
+            relations: ['roles']
+        });
         const isPasswordValid = await compare(user.password, userExist?.password);
 
         if (!userExist) {
@@ -63,7 +68,7 @@ export class AuthService {
         const rolesIds = user.rolesIds;
         const roles = await this.rolesRepository.findBy({ id: In(rolesIds) });
         newUser.roles = roles;
-        
+
         const userSaved = await this.usersRepository.save(newUser);
         const payload = { id: userSaved.id, name: userSaved.name }
         const token = this.jwtService.sign(payload);

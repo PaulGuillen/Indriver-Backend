@@ -19,7 +19,7 @@ export class UsersService {
     }
 
     findAll() {
-        return this.usersRepository.find();
+        return this.usersRepository.find({ relations: ['roles'] });
     }
 
     async update(id: number, user: UpdateUserDTO) {
@@ -34,7 +34,6 @@ export class UsersService {
     }
 
     async updateWithImage(file: Express.Multer.File, id: number, user: UpdateUserDTO) {
-        debugger;
         const url = await cloudStorage(file, file.originalname)
         console.log(url)
         if (url === undefined && url === null) {
