@@ -34,7 +34,8 @@ export class AuthService {
             throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
         }
 
-        const payload = { id: userExist.id, name: userExist.name }
+        const roles = userExist.roles.map(role => role.id);
+        const payload = { id: userExist.id, name: userExist.name, roles: roles }
         const token = this.jwtService.sign(payload);
         const data = {
             user: userExist,
@@ -70,7 +71,8 @@ export class AuthService {
         newUser.roles = roles;
 
         const userSaved = await this.usersRepository.save(newUser);
-        const payload = { id: userSaved.id, name: userSaved.name }
+        const rolesString = userSaved.roles.map(role => role.id);
+        const payload = { id: userSaved.id, name: userSaved.name, roles, rolesString };
         const token = this.jwtService.sign(payload);
 
         const data = {
