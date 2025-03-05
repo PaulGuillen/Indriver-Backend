@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,6 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { dataSource } from './credentials';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { MorganMiddleware } from './utils/morgan.middleware';
+
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
@@ -21,4 +23,9 @@ import { RolesModule } from './roles/roles.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(MorganMiddleware).forRoutes('*');
+  }
+}
