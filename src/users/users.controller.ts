@@ -46,7 +46,8 @@ export class UsersController {
     )
         file: Express.Multer.File,
         @Param('id', ParseIntPipe) id: number,
+        @Body() user: UpdateUserDTO,
     ) {
-        return this.usersService.updateWithImage(file, id, {});
+        return this.usersService.updateWithImage(file, id, user);
     }
 }
