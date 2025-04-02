@@ -15,6 +15,7 @@ export class SocketGateway extends Server implements OnGatewayConnection, OnGate
 
     handleDisconnect(client: Socket) {
         console.log("Client disconnected: ", client.id);
+        this.server.emit("driver_disconnected", { id_socket: client.id });
     }
 
     handleConnection(client: Socket, ...args: any[]) {
