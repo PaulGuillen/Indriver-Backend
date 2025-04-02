@@ -5,6 +5,7 @@ import { Server, Socket } from "socket.io";
     cors: {
         origin: "*",
     },
+    transports : ["websocket"],
 })
 
 export class SocketGateway extends Server implements OnGatewayConnection, OnGatewayDisconnect {
