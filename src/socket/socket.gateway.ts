@@ -24,13 +24,13 @@ export class SocketGateway extends Server implements OnGatewayConnection, OnGate
     @SubscribeMessage("message")
     handleMessage(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
         console.log("Message received: ", data);
-        client.emit("message", 'Bien gracias');
+        this.server.emit("message", 'Bien gracias');
     }
 
     @SubscribeMessage("change_driver_position")
     handleChangeDriverPosition(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-      console.log("Nuevas posicion: ", data);
-      client.emit("new_driver_position", { id: data.id, lat: data.lat, lng: data.lng });
+        console.log("Nuevas posicion: ", data);
+        this.server.emit("new_driver_position", { id_socket : client.id, id: data.id, lat: data.lat, lng: data.lng });
     }
-    
+
 }
