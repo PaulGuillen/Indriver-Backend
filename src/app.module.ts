@@ -8,6 +8,7 @@ import { dataSource } from './credentials';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { MorganMiddleware } from './utils/morgan.middleware';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { MorganMiddleware } from './utils/morgan.middleware';
     UsersModule,
     AuthModule,
     RolesModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
